@@ -5,6 +5,7 @@ import {
     StyleSheet,
     FlatList,
     ActivityIndicator,
+    AsyncStorage,
 } from "react-native";
 import {
     Card,
@@ -16,13 +17,20 @@ import {
 } from "react-native-elements";
 import PostCard from "./../Components/PostCard";
 import { AntDesign, Entypo } from "@expo/vector-icons";
+import { SimpleLineIcons } from '@expo/vector-icons';
 import { AuthContext } from "../Providers/AuthProvider";
 import { StatusBar } from 'expo-status-bar';
-import HeaderHome from "../Components/HeaderHome";
 import { getDataJSON, storeDataJSON } from "../Functions/AsyncStorageFunction";
-import { getAllPosts } from "../Functions/PostFunction"
+import { getAllPosts } from "../Functions/PostFunction";
+import moment from 'moment';
+
+function CurrentDate() {
+  date = new moment().format('MMMM Do YYYY, h:mm a');
+  return date;
+}
 
 const HomeScreen = (props) => {
+    //AsyncStorage.clear();
     const [Posts, setPosts] = useState([]);
     const [SinglePost, setSinglePost] = useState('');
     const [reload,setReload]=useState(false);
@@ -78,18 +86,20 @@ const HomeScreen = (props) => {
                 
               />
               <Button title="Post" type="outline"
+                disabled={SinglePost.length==0 ? true : false}
                 onPress={
                   ()=>{
                       id = Math.floor((Math.random() * 100000) + 1);
                       if(SinglePost.length > 0){
                           let NewPost={
-                          id:"post"+id,
-                          post:SinglePost,
-                          user_name:auth.CurrentUser.name,
-                          user_email:auth.CurrentUser.email,
-                          likes:0,
+                          id : "post"+id,
+                          post : SinglePost,
+                          user_name : auth.CurrentUser.name,
+                          user_email : auth.CurrentUser.email,
+                          likes : 0,
+                          date: CurrentDate(),
                           }
-                          console.log(NewPost);
+                          //console.log(NewPost);
                           storeDataJSON("post"+id,NewPost);
                           setSinglePost("");
                           input.current.clear();
@@ -102,6 +112,7 @@ const HomeScreen = (props) => {
               
             </Card>
             
+            
             <FlatList
               data={Posts}
               onRefresh = { getPosts }
@@ -109,9 +120,9 @@ const HomeScreen = (props) => {
               renderItem={function ({ item }) {
                 return (
                   <PostCard
-                    content = { item.user_name }
+                    content = { item }
                     currentUser = {auth.CurrentUser}
-                    navigation = { props }
+                    navigation = { props.navigation }
                   />
                 );
               }}

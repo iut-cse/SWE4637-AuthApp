@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, StyleSheet, AsyncStorage } from "react-native";
+import { View, StyleSheet, AsyncStorage, Image } from "react-native";
 import { Text, Card, Button, Avatar, Header } from "react-native-elements";
 import { AuthContext } from "../Providers/AuthProvider";
 const ProfileScreen = (props) => {
@@ -26,23 +26,14 @@ const ProfileScreen = (props) => {
                     }}
           />
 
-          <Card>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Avatar
-                containerStyle={{ backgroundColor: "cyan" }}
-                rounded
-                icon={{
-                  name: "thumbs-o-up",
-                  type: "font-awesome",
-                  color: "black",
-                }}
-                activeOpacity={1}
-              />
-              <Text style={{ paddingHorizontal: 10 }}>
-                {auth.CurrentUser.name} Liked Your Post.
-              </Text>
-            </View>
-          </Card>
+          <Image
+            source = {require("../../assets/avatar.png")}
+            style = {{alignSelf : "center", width : 200, height : 200, margin : 20, marginTop : 60}}
+          />
+          <Text style = {styles.textStyle}>Name : Nafis Saami Azad</Text>
+          <Text style = {styles.textStyle}>Student ID : 170042007</Text>
+          <Text style = {styles.textStyle}>Room no : Non-resident</Text>
+          <Text style = {styles.textStyle}>Email : nafissazad@gmail.com</Text>
         </View>
       )}
     </AuthContext.Consumer>
@@ -50,13 +41,12 @@ const ProfileScreen = (props) => {
 };
 
 const styles = StyleSheet.create({
-  textStyle: {
-    fontSize: 30,
-    color: "blue",
-  },
-  viewStyle: {
-    flex: 1,
-  },
+  textStyle : {
+      fontSize : 22,
+      fontWeight : "bold",
+      textAlign : "center",
+      top : 40,
+  }
 });
 
 export default ProfileScreen;

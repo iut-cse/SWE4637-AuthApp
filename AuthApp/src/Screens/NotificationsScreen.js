@@ -1,8 +1,30 @@
-import React, { useState } from "react";
-import { View, StyleSheet, AsyncStorage } from "react-native";
-import { Text, Card, Button, Avatar, Header } from "react-native-elements";
+import React,{ useState, useEffect } from 'react';
+import {  FlatList, View, StyleSheet } from 'react-native';
+import { Header } from 'react-native-elements';
 import { AuthContext } from "../Providers/AuthProvider";
+import { getDataJSON } from "../Functions/AsyncStorageFunction";
+import NotificationCard from "../Components/NotificationCard";
+
 const NotificationScreen = (props) => {
+  let [notifications, setNotifications] = useState([]);
+  const [reload,setReload]=useState(false);
+
+  const getNotification = async() => {
+    setReload(true);
+    let notify = await getDataJSON('notification');
+    if(notify!=null ){
+      setNotifications(notify);
+    }
+    else{
+      console.log("No new notifications");
+    }
+    setReload(false);
+  }
+
+  useEffect(()=>{
+    getNotification();
+  },[]);
+
   return (
     <AuthContext.Consumer>
       {(auth) => (
@@ -25,23 +47,24 @@ const NotificationScreen = (props) => {
               },
             }}
           />
-          <Card>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Avatar
-                containerStyle={{ backgroundColor: "cyan" }}
-                rounded
-                icon={{
-                  name: "thumbs-o-up",
-                  type: "font-awesome",
-                  color: "black",
-                }}
-                activeOpacity={1}
-              />
-              <Text style={{ paddingHorizontal: 10 }}>
-                Pam Beesley Liked Your Post.
-              </Text>
-            </View>
-          </Card>
+          <View>
+            <FlatList
+              data = {notifications}
+              onRefresh = {getNotification}
+              refreshing = {reload}
+              renderItem = {function ({ item}) {
+                if(item.receiver == auth.CurrentUser.email){
+                  return (
+                    <NotificationCard
+                      content = { item }
+                      navigation = {props.navigation}
+                    />
+                  );
+                }
+              }}
+              keyExtractor={(item, index) => index.toString()}
+            />
+          </View>
         </View>
       )}
     </AuthContext.Consumer>

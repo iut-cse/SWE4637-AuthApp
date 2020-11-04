@@ -8,17 +8,21 @@ import NotificationScreen from "./src/Screens/NotificationsScreen";
 import ProfileScreen from "./src/Screens/ProfileScreen";
 import SignUpScreen from "./src/Screens/SignUpScreen";
 import SignInScreen from "./src/Screens/SignInScreen";
+import IndividualPostScreen from "./src/Screens/IndividualPostScreen";
 
 import { AuthContext, AuthProvider } from "./src/Providers/AuthProvider";
 import { Entypo, AntDesign, Ionicons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+
 const AuthStack = createStackNavigator();
 const HomeTab = createMaterialBottomTabNavigator();
 const AppDrawer = createDrawerNavigator();
+const HomeStack = createStackNavigator();
 
 const AppDrawerScreen = () => {
   return (
     <AppDrawer.Navigator>
-      <AppDrawer.Screen name="Home" component={HomeTabScreen} />
+      <AppDrawer.Screen name="Home" component={HomeStackScreen} />
       <AppDrawer.Screen name="Profile" component={ProfileScreen} />
     </AppDrawer.Navigator>
   );
@@ -36,7 +40,7 @@ const HomeTabScreen = () => {
             focused ? (
               <Entypo name="home" color="white" size={26} />
             ) : (
-              <AntDesign name="home" color="white" size={22} />
+              <MaterialCommunityIcons name="home-outline" size={28} color="white" />
             ),
         }}
       />
@@ -50,10 +54,7 @@ const HomeTabScreen = () => {
               <Ionicons name="ios-notifications" size={26} color="white" />
             ) : (
               <Ionicons
-                name="ios-notifications-outline"
-                size={22}
-                color="white"
-              />
+                name="ios-notifications-outline" size={24} color="white" />
             ),
         }}
       />
@@ -77,6 +78,15 @@ const AuthStackScreen = () => {
     </AuthStack.Navigator>
   );
 };
+
+const HomeStackScreen = () => {
+  return (
+    <HomeStack.Navigator>
+      <HomeStack.Screen name = "Home" component = {HomeTabScreen} options = {{headerShown : false}}/>
+      <HomeStack.Screen name = "Post" component = {IndividualPostScreen} options = {{headerShown : false}} />
+    </HomeStack.Navigator>
+  )
+}
 
 function App() {
   return (

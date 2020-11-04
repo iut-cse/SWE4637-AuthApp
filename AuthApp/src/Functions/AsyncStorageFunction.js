@@ -38,7 +38,7 @@ const getDataJSON = async (key) => {
       const jsonData = JSON.parse(data);
       return jsonData;
     } else {
-      alert("Email cannot be blank!");
+      console.log("Email cannot be blank!");
     }
   } catch (error) {
     alert(error);
@@ -48,7 +48,7 @@ const getDataJSON = async (key) => {
 const removeData = async (key) => {
   try {
     await AsyncStorage.removeItem(key);
-    alert("Data Removed Successfully");
+    console.log("Data Removed Successfully");
   } catch (error) {
     alert(error);
   }
