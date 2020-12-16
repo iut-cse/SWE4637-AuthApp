@@ -1,29 +1,30 @@
-import React,{ useState, useEffect } from 'react';
-import {  FlatList, View, StyleSheet } from 'react-native';
-import { Header } from 'react-native-elements';
+import React, { useState, useEffect } from "react";
+import { FlatList, View, StyleSheet } from "react-native";
+import { Header } from "react-native-elements";
 import { AuthContext } from "../Providers/AuthProvider";
 import { getDataJSON } from "../Functions/AsyncStorageFunction";
 import NotificationCard from "../Components/NotificationCard";
+import * as firebase from "firebase";
+import "firebase/firestore";
 
 const NotificationScreen = (props) => {
   let [notifications, setNotifications] = useState([]);
-  const [reload,setReload]=useState(false);
+  const [reload, setReload] = useState(false);
 
-  const getNotification = async() => {
+  const getNotification = async () => {
     setReload(true);
-    let notify = await getDataJSON('notification');
-    if(notify!=null ){
+    let notify = await getDataJSON("notification");
+    if (notify != null) {
       setNotifications(notify);
-    }
-    else{
+    } else {
       console.log("No new notifications");
     }
     setReload(false);
-  }
+  };
 
-  useEffect(()=>{
+  useEffect(() => {
     getNotification();
-  },[]);
+  }, []);
 
   return (
     <AuthContext.Consumer>
@@ -42,22 +43,30 @@ const NotificationScreen = (props) => {
               icon: "lock-outline",
               color: "#fff",
               onPress: function () {
-                auth.setIsLoggedIn(false);
-                auth.setCurrentUser({});
+                firebase
+                  .auth()
+                  .signOut()
+                  .then(() => {
+                    auth.setIsLoggedIn(false);
+                    auth.setCurrentUser({});
+                  })
+                  .catch((error) => {
+                    alert(error);
+                  });
               },
             }}
           />
           <View>
             <FlatList
-              data = {notifications}
-              onRefresh = {getNotification}
-              refreshing = {reload}
-              renderItem = {function ({ item}) {
-                if(item.receiver == auth.CurrentUser.email){
+              data={notifications}
+              onRefresh={getNotification}
+              refreshing={reload}
+              renderItem={function ({ item }) {
+                if (item.receiver == auth.CurrentUser.email) {
                   return (
                     <NotificationCard
-                      content = { item }
-                      navigation = {props.navigation}
+                      content={item}
+                      navigation={props.navigation}
                     />
                   );
                 }

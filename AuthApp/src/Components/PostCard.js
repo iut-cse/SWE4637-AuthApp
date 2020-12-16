@@ -1,14 +1,16 @@
-import React, {useState} from "react";
+import React from "react";
 import { View } from "react-native";
 import { Card, Button, Text, Avatar } from "react-native-elements";
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { AntDesign } from "@expo/vector-icons";
-import { mergeData } from "../Functions/AsyncStorageFunction";
-import AddNotification from "../Functions/NotificationFunction";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+
+import * as firebase from "firebase";
+import "firebase/firestore";
 
 const PostCard = (props) => {
-  const [like, setlike] = useState(props.content.likes);
+  let time = props.content.created_at.toDate();
   //console.log(props.content);
+  //console.log(props.postid);
+  //console.log(props.currentUser);
 
   return (
     <Card>
@@ -16,7 +18,8 @@ const PostCard = (props) => {
         style={{
           flexDirection: "row",
           alignItems: "center",
-        }}>
+        }}
+      >
         <Avatar
           containerStyle={{ backgroundColor: "#ffab91" }}
           rounded
@@ -25,45 +28,57 @@ const PostCard = (props) => {
         />
 
         <Text h4Style={{ padding: 10 }} h4>
-          {props.content.user_name}
+          {props.content.author}
         </Text>
       </View>
-      <Text >{props.content.date}</Text>
+      <Text>{time.toString()}</Text>
       <Text
         style={{
           paddingVertical: 10,
-          fontSize : 20
+          fontSize: 20,
         }}
       >
-        {props.content.post}
+        {props.content.body}
       </Text>
       <Card.Divider />
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
         <Button
-          type=  "outline"
-          title = { " LIKES  (" + like + ") " } 
+          type="outline"
+          title={" LIKES  (" + props.content.likes.length + ") "}
           raised
-          icon={< MaterialCommunityIcons name="heart-outline" size={27} color="lightsalmon" />}
-          onPress = { async () => {
-            await mergeData(props.content.id, JSON.stringify({likes : like + 1}));
-            let likedObject = {
-              postid : props.content.id,
-              comment : "",
-	            receiver : props.content.user_email,
-              sender : props.currentuser.name,
-            };
-            await AddNotification(likedObject);
-            setlike(like + 1)
-
+          icon={
+            <MaterialCommunityIcons
+              name="heart-outline"
+              size={27}
+              color="lightsalmon"
+            />
+          }
+          onPress={async () => {
+            firebase
+              .firestore()
+              .collection("posts")
+              .doc(props.postid)
+              .update({
+                likes: firebase.firestore.FieldValue.arrayUnion(
+                  props.currentUser.uid
+                ),
+              })
+              .catch((error) => {
+                alert(error);
+              });
           }}
         />
         <Button
           type="outline"
-          titleStyle = {{fontSize : 18}}
+          titleStyle={{ fontSize: 18 }}
           title="Comment"
           raised
-          onPress = { function () {
-            props.navigation.navigate("Post", { post : props.content.id })
+          onPress={function () {
+            props.navigation.navigate("Post", {
+              postid: props.postid,
+              currentUser: props.currentUser,
+              content: props.content,
+            });
           }}
         />
       </View>
